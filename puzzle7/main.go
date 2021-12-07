@@ -23,13 +23,53 @@ func readInput(r io.Reader) ([]int, error) {
 	return numbers, nil
 }
 
+func absDiff(a, b int) int {
+	if a > b {
+		return a - b
+	}
+	return b - a
+}
+
+func fuelCost(crabPosCount map[int]int, candidatePos int) int {
+	cost := 0
+	for pos, numCrabs := range crabPosCount {
+		cost += absDiff(pos, candidatePos) * numCrabs
+	}
+	return cost
+}
+
 func part1(crabPositions []int) int {
-	return 0
+	// generate map of crab position counts
+	crabPosCount := map[int]int{}
+	for _, crabPos := range crabPositions {
+		if _, found := crabPosCount[crabPos]; !found {
+			crabPosCount[crabPos] = 1
+		} else {
+			crabPosCount[crabPos]++
+		}
+	}
+
+	// for each crab position calculate difference and sum them keeping track of min
+	minCost := -1
+	for pos := range crabPosCount {
+		// first cost
+		if minCost == -1 {
+			minCost = fuelCost(crabPosCount, pos)
+			continue
+		}
+
+		cost := fuelCost(crabPosCount, pos)
+		if cost < minCost {
+			minCost = cost
+		}
+	}
+
+	return minCost
 }
 
 func main() {
-	//file, err := os.Open("inputs.txt")
-	file, err := os.Open("example.txt")
+	file, err := os.Open("inputs.txt")
+	//file, err := os.Open("example.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -39,5 +79,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(numbers)
+	fmt.Println(part1(numbers))
 }
